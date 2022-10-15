@@ -1,0 +1,26 @@
+.items ul {
+    width: calc(100 + 20px);
+    margin: 0 -10px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.items li {
+    padding: 0 10px 20px;
+}
+
+.items li a,
+.items li a:visited {
+    text-decoration: none;
+    color: #111;
+}
+
+.items li p {
+    font-size: 90%;
+    margin-bottom: 3px;
+}
+
+.items li span {
+    font-size: 80%;
+    display: block;
+}
