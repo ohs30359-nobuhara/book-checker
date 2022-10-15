@@ -80,6 +80,8 @@ func getBookInfo(isbn string) (Book, error)  {
 
 	buf, _ := ioutil.ReadAll(resp.Body)
 
+	println(string(buf))
+
 	var res ApiResponse
 	if e := json.Unmarshal(buf, &res); e != nil {
 		return Book{}, errors.New("fail request")
