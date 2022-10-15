@@ -6,7 +6,6 @@ const  App = () => {
   return (
     <div className="columns">
       <div className={"column is-10 is-offset-1"}>
-
         <BookList/>
       </div>
     </div>
