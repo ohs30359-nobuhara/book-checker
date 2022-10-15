@@ -14,7 +14,7 @@ export const BookList = () => {
 
   useEffect(() => {
     (async () => {
-      setList(await (await fetch("https://raw.githubusercontent.com/ohs30359-nobuhara/book-checker/master/public/resources/books.json")).json());
+      setList(await (await fetch("https://ohs30359-nobuhara.github.io/book-checker/resources/books.json")).json());
     })();
   },[])
 
