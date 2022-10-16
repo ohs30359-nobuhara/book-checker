@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	filePath := "./public/resources/books.json"
+	filePath := "./docs/resources/books.json"
 
 	f := flag.String("isbn", "", "input isbn code")
 	flag.Parse()
@@ -39,6 +39,19 @@ func main() {
 		}
 	}
 
+	// 追加する前に重複確認
+	duplication := false
+	for _, item := range books {
+		if item.Isbn10 == book.Isbn10 || item.Isbn13 == book.Isbn13 {
+			duplication = true
+			break
+		}
+	}
+
+	if duplication {
+		panic("isbn is duplicate")
+	}
+
 	books = append(books, book)
 	buf, e = json.Marshal(books)
 
@@ -60,6 +73,10 @@ type ApiResponse struct {
 			ImageLinks struct{
 				Thumbnail string `json:"thumbnail"`
 			} `json:"imageLinks"`
+			IndustryIdentifiers []struct{
+				Type string `json:"type"`
+				Identifier string `json:"identifier"`
+			} `json:"industryIdentifiers"`
 			PreviewLink string `json:"previewLink"`
 		}`json:"volumeInfo"`
 	} `json:"items"`
@@ -70,6 +87,8 @@ type Book struct {
 	SubTitle string
 	Image string
 	Preview string
+	Isbn10 string
+	Isbn13 string
 }
 
 func getBookInfo(isbn string) (Book, error)  {
@@ -93,11 +112,21 @@ func getBookInfo(isbn string) (Book, error)  {
 
 	// ISBNなので必ず1件HIT
 	var book Book
-	for _, v := range res.Items {
-		book.Title = v.VolumeInfo.Title
-		book.SubTitle = v.VolumeInfo.SubTitle
-		book.Image = v.VolumeInfo.ImageLinks.Thumbnail
-		book.Preview = v.VolumeInfo.PreviewLink
+	for _, item := range res.Items {
+		book.Title = item.VolumeInfo.Title
+		book.SubTitle = item.VolumeInfo.SubTitle
+		book.Image = item.VolumeInfo.ImageLinks.Thumbnail
+		book.Preview = item.VolumeInfo.PreviewLink
+
+		for _, identifier := range item.VolumeInfo.IndustryIdentifiers {
+			switch identifier.Type {
+			case "ISBN_10":
+				book.Isbn10 = identifier.Identifier
+				break
+			case "ISBN_13":
+				book.Isbn13 = identifier.Identifier
+			}
+		}
 	}
 
 	return book, nil
