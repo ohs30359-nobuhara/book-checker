@@ -1,44 +1,79 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {CSSProperties, useEffect, useState} from "react";
+import {CSSProperties, useState} from "react";
 
-interface Item {
-  Title: string
-  SubTitle: string
-  Image: string
-  Preview: string
+interface Props {
+  items: {
+    Title: string
+    SubTitle: string
+    Image: string
+    Preview: string
+  }[]
 }
 
-export const BookList = () => {
-  const [list, setList] = useState<Item[]>([]);
+const style: {[key: string]: CSSProperties} = {
+  imgContents: {
+    backgroundColor: "#e1e1e14d",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: "10px",
+    paddingBottom: "10px"
+  },
+  img: {
+    width: "150px",
+    height: "200px"
+  },
+  pagination: {
+    display: "flex",
+    justifyContent: "center"
+  }
+}
 
-  useEffect(() => {
-    (async () => {
-      setList(await (await fetch("https://ohs30359-nobuhara.github.io/book-checker/resources/books.json")).json());
-    })();
-  },[])
+export const BookList = (props: Props) => {
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  //word-wrap: break-word;
-  const components: JSX.Element[] = list.map((item, i) => {
-    return (
-      <div className="tile is-vertical is-3">
+  const pages: JSX.Element[] = sliceArray(props.items, 4).map(arr => {
+    const col: JSX.Element[] = arr.map((item, i) => {
+      return <div className="tile is-vertical is-3">
         <div className="tile is-parent is-vertical">
-          <article className="tile is-child">
-            <img src={item.Image} />
-            <p><strong>{item.Title}</strong></p>
+          <div style={style.imgContents}>
+            <img src={item.Image} style={style.img}/>
+          </div>
+          <article className="tile is-child" style={{marginTop: "20px"}}>
+            <p style={{marginTop: "20px"}}><strong>{item.Title}</strong></p>
             <small>{item.SubTitle}</small>
           </article>
         </div>
       </div>
-    )
+    })
+
+    return <div className="tile"> {col} </div>
   })
+
+  const pageList: Array<JSX.Element[]> = sliceArray(pages, 4);
 
   return (
     <div>
-      <input className="input" type="text" placeholder="Text input" style={{marginBottom: "40px", marginTop: "20px"}}/>
-      <div className="tile is-ancestor">
-        {components}
-      </div>
+      {pageList[activeIndex]}
+      <nav className="pagination" role="navigation" aria-label="pagination">
+        <ul className="pagination-list" style={style.pagination}>
+          { pageList.map((page, i) =>
+            <li>
+              <a className={ activeIndex === i? "pagination-link is-current" : "pagination-link" } onClick={() => setActiveIndex(i)}>{i+1}</a>
+            </li>)
+          }
+        </ul>
+      </nav>
     </div>
   )
+}
+
+function sliceArray<T>(array: Array<T>, split: number): Array<T[]> {
+  const length = Math.ceil(array.length / split);
+
+  return new Array(length)
+    .fill(null)
+    .map((_, i) => array.slice(i * split, (i + 1) * split));
 }
