@@ -33,6 +33,7 @@ const style: {[key: string]: CSSProperties} = {
 
 export const BookList = (props: Props) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  // listが上位コンポーネントで変更される時、indexだけ固定されているので存在しないindexを参照して空になる (つまりページネーション2の時にフィルターすると上手く機能しない)
 
   const pages: JSX.Element[] = sliceArray(props.items, 4).map(arr => {
     const col: JSX.Element[] = arr.map((item, i) => {
